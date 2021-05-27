@@ -7,16 +7,10 @@ class IngredientInline(admin.TabularInline):
     extra = 0
 
 
-class TagInline(admin.TabularInline):
-    model = Tag
-    extra = 0
-
-
 class RecipeAdmin(admin.ModelAdmin):
-    inlines = [IngredientInline, TagInline]
+    inlines = [IngredientInline]
 
 
 admin.site.register(Ingredient)
 admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(RecipeIngredient)
 admin.site.register(Tag)

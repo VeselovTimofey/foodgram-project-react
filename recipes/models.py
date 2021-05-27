@@ -19,6 +19,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to="recipes/", blank=True, null=True)
     description = models.TextField()
     ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient")
+    tag = models.ManyToManyField("Tag")
     time_cooking = models.PositiveIntegerField()
     slug = models.SlugField(unique=True, max_length=75)
 
@@ -34,6 +35,6 @@ class RecipeIngredient(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
-    recipe = models.ForeignKey(Recipe,
-                               on_delete=models.SET_NULL,
-                               related_name="tag", null=True)
+
+    def __str__(self):
+        return self.name
