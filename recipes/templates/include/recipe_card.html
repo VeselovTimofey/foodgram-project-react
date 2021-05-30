@@ -1,0 +1,28 @@
+<div class="card" data-id="{{ recipe.id }}">
+
+    {% comment %}
+    <a href="{% url 'recipe' recipe_id=recipe.id slug=recipe.slug %}" class="link" >
+        <img src="{{ recipe.image.url }}" alt="{{ recipe.name }}" class="card__image">
+    </a>
+    {% endcomment %}
+    <img src="{{ recipe.image }}" alt="{{ recipe.name }}" class="card__image">
+
+    <div class="card__body">
+        {% comment %}
+            <a class="card__title link" href="#"> {{ recipe.name }}</a>
+        {% endcomment %}
+        {% include "include/tags.html" %}
+        <div class="card__items card__items_column">
+            <p class="card__text"><span class="icon-time"></span> {{ recipe.time_cooking }} мин.</p>
+            <p class="card__text"><span class="icon-user"></span>
+                <a href="#" style="color: black">
+                    {% firstof recipe.author.get_full_name recipe.author.username %}
+                </a>
+            </p>
+        </div>
+    </div>
+    <div class="card__footer">
+        <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+        <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
+    </div>
+</div>
