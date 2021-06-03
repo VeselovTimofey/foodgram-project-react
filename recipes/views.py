@@ -41,6 +41,7 @@ class FavoriteView(LoginRequiredMixin, BaseRecipeListView):
 
 class ProfileView(BaseRecipeListView):
     """ User`s page with its name and list of authored Recipes. """
+    template_name = "templates/profile.html"
 
     def get(self, request, *args, **kwargs):
         self.user = get_object_or_404(User, username=kwargs.get("username"))
@@ -53,3 +54,6 @@ class ProfileView(BaseRecipeListView):
 
     def _get_page_title(self):
         return self.user.get_full_name()
+
+
+#class RecipeDetailView()
