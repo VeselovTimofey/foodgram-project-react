@@ -15,6 +15,16 @@ class Ingredient(models.Model):
         ordering = ("name",)
 
 
+class RecipeQuerySet(models.QuerySet):
+    def with_is_favorite(self, user_id):
+        return self.annotate(is_favorite=models.Exists(
+            Favorite.objects.filter(
+                user_id=user_id,
+                recipe_id=models.OuterRef("pk"),
+            ),
+        ))
+
+
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name="author_recipe")

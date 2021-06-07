@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import DetailView
 from django.views.generic.list import ListView
 from recipes.models import Recipe
 from django.contrib.auth import get_user_model
@@ -56,4 +57,12 @@ class ProfileView(BaseRecipeListView):
         return self.user.get_full_name()
 
 
-#class RecipeDetailView()
+class RecipeDetailView(DetailView):
+    """Page with Recipe details."""
+    queryset = Recipe.objects.all()
+    template_name = "templates/recipe_detail.html"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        #qs = qs.with_is_favorite(user_id=self.request.user.id)
+        return qs
