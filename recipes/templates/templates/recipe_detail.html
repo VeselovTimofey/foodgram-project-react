@@ -19,16 +19,16 @@
             <div class="single-card__header-info">
                 <h1 class="single-card__title">{{ recipe.name }}</h1>
                 <div class="single-card__favorite">
-                    <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite icon-favorite_big"></span></button>
+                    {% include 'include/favorite_button.html' %}
                     <div class="single-card__favorite-tooltip tooltip">
-                        {%if user.is_authenticated and recipe.is_favorite %}Убрать из избранного{% else %}Добавить в избранное{% endif %}
+                        {% if user.is_authenticated and recipe.is_favorite %}Убрать из избранного{% else %}Добавить в избранное{% endif %}
                     </div>
                 </div>
             </div>
 
             <ul class="single-card__items">
-                {% for tag in recipe.tags.all %}
-                    <li class="single-card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
+                {% for tag in recipe.tag.all %}
+                    <li class="single-card__item"><span class="badge badge_style_green">{{ tag.name }}</span></li>
                 {% endfor %}
             </ul>
 
@@ -54,9 +54,9 @@
                 <h3 class="single-card__section-title">Ингридиенты:</h3>
                 <div class="single-card__items single-card__items_column">
                     <ul class="card__items">
-                        {% for recipeingredient in recipe.recipeingredient.all %}
+                        {% for recipe_ingredient in recipe.ingredient_in_recipe.all %}
                             <li class=" single-card__section-item">
-                                {{ recipeingredient.ingredient.name }} - {{ recipeingredient.ingredient.unit }}
+                                {{ recipe_ingredient.ingredient.name }} - {{ ingredient_in_recipe.count }} {{ recipe_ingredient.ingredient.unit }}
                             </li>
                         {% endfor %}
                     </ul>
@@ -65,7 +65,7 @@
 
             <div class="single-card__section">
                 <h3 class="single-card__section-title">Описание:</h3>
-                <p class="single-card__section-text">{{ recipe.text|linebreaksbr }}</p>
+                <p class="single-card__section-text">{{ recipe.description|linebreaksbr }}</p>
             </div>
         </div>
     </div>
