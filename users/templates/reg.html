@@ -19,13 +19,13 @@
         <form class="form" method="post" action="{% url 'reg' %}">
             {% csrf_token %}
             <div class="form__group">
-                <label for="id_first_name" class="form__label">Имя</label>
+                <label class="form__label">Имя</label>
                 <div class="form__field-group">
                     {{ form.first_name|addclass:"form__input" }}
                 </div>
             </div>
             <div class="form__group">
-                <label for="id_username" class="form__label">Имя пользователя</label>
+                <label class="form__label">Имя пользователя</label>
                 <div class="form__field-group">
                     {{ form.username|addclass:"form__input" }}
                     <small id="id_username-help" class="form-text text-muted">
@@ -34,13 +34,13 @@
                 </div>
             </div>
             <div class="form__group">
-                <label for="id_email" class="form__label">Адрес электронной почты</label>
+                <label class="form__label">Адрес электронной почты</label>
                 <div class="form__field-group">
                     {{ form.email|addclass:"form__input" }}
                 </div>
             </div>
             <div class="form__group">
-                <label for="id_password1" class="form__label">Пароль</label>
+                <label class="form__label">Пароль</label>
                 <div class="form__field-group">
                     {{ form.password1|addclass:"form__input" }}
                     <small id="id_password1-help" class="form-text text-muted">
@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div class="form__group">
-                <label for="id_password2" class="form__label">Подтверждения пароля</label>
+                <label class="form__label">Подтверждения пароля</label>
                 <div class="form__field-group">
                     {{ form.password2|addclass:"form__input" }}
                     <small id="id_password2-help" class="form-text text-muted">

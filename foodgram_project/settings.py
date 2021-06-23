@@ -33,15 +33,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'recipes.apps.RecipesConfig',
+    'users.apps.UsersConfig',
+    'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'recipes.apps.RecipesConfig',
-    'users.apps.UsersConfig',
-    'sorl.thumbnail'
+    'sorl.thumbnail',
 ]
 
 MIDDLEWARE = [
@@ -128,6 +129,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = 'index'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

@@ -1,0 +1,19 @@
+{% extends "include/base.html" %}
+{% load static %}
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
+{% block static_css %}
+    <link rel="stylesheet" href="{% static 'pages/form.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">Вы вышли из системы.</h1>
+    </div>
+    <div class="form-container">
+        <h3 class="link"><a href="{% url 'index' %}">Вернуться на главную страницу.</a></h3>
+    </div>
+{% endblock %}
