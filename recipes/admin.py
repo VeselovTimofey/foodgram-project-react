@@ -28,7 +28,8 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    fields = ("name",)
+    fields = ("name", "color",)
+    list_display = ("name", "color",)
     search_fields = ("name",)
 
 

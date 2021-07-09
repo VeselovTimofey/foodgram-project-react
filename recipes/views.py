@@ -1,9 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.views.generic.list import ListView
-from recipes.models import Recipe
+from recipes.models import Recipe, RecipeIngredient, Ingredient
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from .forms import RecipeForm
 
 User = get_user_model()
 
@@ -66,3 +70,54 @@ class RecipeDetailView(DetailView):
         qs = super().get_queryset()
         #qs = qs.with_is_favorite(user_id=self.request.user.id)
         return qs
+
+
+def create_recipe(request):
+
+    def create_slug(name):
+        name = name.lower()
+        alphabet = {"а": "a", "б": "b", "в": "f", "г": "g", "д": "d",
+                    "е": "e", "ё": "e", "ж": "sh", "з": "z", "и": "i",
+                    "й": "i", "к": "k", "л": "l", "м": "m", "н": "n",
+                    "о": "o", "п": "p", "р": "r", "с": "s", "т": "t",
+                    "у": "u", "ф": "v", "х": "h", "ц": "c", "ч": "ch",
+                    "ш": "sh", "щ": "sh", "ы": "i", "э": "e", "ю": "ai",
+                    "я": "yi"}
+        slug = ""
+        for n in name:
+            if n in ["ь", "ъ", " "]:
+                continue
+            slug += alphabet[n]
+        return slug
+
+    def get_ingredient():
+        ingredients = {}
+        for key, value in request.POST.items():
+            if key.startswith("nameIngredient"):
+                number = key.split("_")[1]
+                ingredients[value] = request.POST[f"valueIngredient_{number}"]
+        return ingredients
+
+    if request.method != "POST":
+        form = RecipeForm()
+
+        return render(request, "templates/recipe_create.html", {"form": form})
+
+    form = RecipeForm(request.POST or None, files=request.FILES or None)
+
+    if form.is_valid():
+        recipe = form.save(commit=False)
+        recipe.author = request.user
+        recipe.slug = create_slug(recipe.name)
+        recipe.save()
+        for key, value in request.POST.items():
+            print(key, value)
+        ingredients = get_ingredient()
+        for name in ingredients:
+            ingredient = get_object_or_404(Ingredient, name=name)
+            RecipeIngredient.objects.create(recipe=recipe,
+                                            ingredient=ingredient,
+                                            count=ingredients[name])
+        return redirect(reverse("index"))
+
+    return render(request, "templates/recipe_create.html", {"form": form})

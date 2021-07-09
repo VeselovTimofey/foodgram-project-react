@@ -1,0 +1,99 @@
+{% extends "include/base.html" %}
+{% load static %}
+
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
+
+{% block static_css %}
+    <link rel="stylesheet" href="{% static 'pages/form.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">Создание рецепта</h1>
+    </div>
+    <div class="form-container">
+        <form class="form" method="post" action="{% url 'create_recipe' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form__group">
+                <label class="form__label">{{ form.name.label }}</label>
+                <div class="form__field-group">
+                    {{ form.name }}
+                    <span class="form__error"></span>
+                </div>
+            </div>
+            <div class="form__group">
+                <p class="form__label">{{ form.tag.label }}</p>
+                <div class="form__field-group">
+                    <div class="tags">
+                        {% for tag in form.all_tags %}
+                            <div class="tags__item">
+                                <input type="checkbox" id="tag" class="tags__checkbox tags__checkbox_style_{{ tag.color }}">
+                                <label class="tags__label">{{ tag.name }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <span class="form__error"></span>
+                </div>
+            </div>
+            <div class="form__group">
+                <label class="form__label">Ингредиенты</label>
+                <div class="form__field-group">
+                    <div class="form__field-group-ingredientes">
+                        <div class="form__dropdown">
+                            <select class="form__input" id="nameIngredient">
+                                {% for ingredient in form.all_ingredient %}
+                                    <option>{{ ingredient.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form__dropdown-items"></div>
+                        </div>
+                        <input type="number" id="cantidad" class="form__input" min="0">
+                        <label class="form__label" id="cantidadVal"></label>
+                    </div>
+                    <div class="form__field-group-ingredientes-container"></div>
+                    <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
+                    <span class="form__error"></span>
+                </div>
+            </div>
+            <div class="form__group">
+                <label class="form__label">{{ form.time_cooking.label }}</label>
+                <div class="form__field-group form__field-group_time">
+                    {{ form.time_cooking }}
+                    <label class="form__label">минут</label>
+                    <span class="form__error"></span>
+                </div>
+            </div>
+            <div class="form__group">
+                <label class="form__label">{{ form.description.label }}</label>
+                <div class="form__field-group">
+                    {{ form.description }}
+                    <span class="form__error"></span>
+                </div>
+            </div>
+            <div class="form__group">
+                <span class="form__label">{{ form.image.label }}</span>
+                <div class="form__field-group">
+                    {{ form.image }}
+                    <span class="form__error"></span>
+                </div>
+            </div>
+            <div class="form__footer">
+                <button class="button button_style_blue">Создать рецепт</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+
+{% block static_js %}
+    <script src="{% static 'js/config/config.js' %}"></script>
+    <script src="{% static 'js/components/Header.js' %}"></script>
+    <script src="{% static 'js/utils/debouncing.js' %}"></script>
+    <script src="{% static 'js/api/Api.js' %}"></script>
+    <script src="{% static 'formRecipe.js' %}"></script>
+{% endblock %}

@@ -25,6 +25,14 @@ class RecipeQuerySet(models.QuerySet):
         ))
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+    color = models.CharField(max_length=50, default="orange")
+
+    def __str__(self):
+        return self.name
+
+
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name="author_recipe")
@@ -32,7 +40,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to="recipes/images/", blank=True, null=True)
     description = models.TextField()
     ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient")
-    tag = models.ManyToManyField("Tag")
+    tag = models.ManyToManyField(Tag, null=True, related_name="recipe_tag")
     time_cooking = models.PositiveIntegerField()
     slug = models.SlugField(unique=True, max_length=75)
     pub_date = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -46,17 +54,10 @@ class Recipe(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
-                               related_name="recipe")
+                               related_name="ingredients_in_recipe")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
-                                   related_name="ingredient_in_recipe")
+                                   related_name="ingredient_in_recipes")
     count = models.PositiveIntegerField()
-
-
-class Tag(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
 
 
 class Favorite(models.Model):

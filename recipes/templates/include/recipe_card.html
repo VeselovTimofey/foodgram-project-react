@@ -6,7 +6,11 @@
 
     <div class="card__body">
             <a class="card__title link" href="{% url 'recipe' slug=recipe.slug %}"> {{ recipe.name }}</a>
-        {% include "include/tags.html" %}
+            <ul class="card__items">
+                {% for tag in recipe.tag.all %}
+                    <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
+                {% endfor %}
+            </ul>
         <div class="card__items card__items_column">
             <p class="card__text"><span class="icon-time"></span> {{ recipe.time_cooking }} мин.</p>
             <p class="card__text"><span class="icon-user"></span>

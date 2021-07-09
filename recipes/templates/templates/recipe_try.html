@@ -1,0 +1,64 @@
+{% extends "include/base.html" %}
+{% load static %}
+
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
+
+{% block static_css %}
+    <link rel="stylesheet" href="{% static 'pages/form.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">Создание рецепта</h1>
+    </div>
+    <div class="form-container">
+        <form class="form" method="post" action="{% url 'create_recipe' %}">
+            {% csrf_token %}
+            {% for field in form %}
+                {% if field.label == "Теги" %}
+                    <div class="form__group">
+                        <p class="form__label">{{ field.label }}</p>
+                        <div class="form__field-group">
+                            <div class="tags">
+                                {% for tag in form.tag %}
+                                    <div class="tags__item">
+                                        <input type="checkbox" class="tags__checkbox tags__checkbox_style_{{ field.color }}">
+                                        <label class="tags__label">{{ tag }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <span class="form__error"></span>
+                         </div>
+                    </div>
+                {% elif field.label == "Ингредиенты" %}
+                    <div class="form__group">
+                    </div>
+                {% else %}
+                    <div class="form__group">
+                        <label class="form__label">{{ field.label }}</label>
+                        <div class="form__field-group">
+                            {{ field }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <div class="form__footer">
+                <button class="button button_style_blue">Создать рецепт</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+
+{% block static_js %}
+    <script src="{% static 'js/config/config.js' %}"></script>
+    <script src="{% static 'js/components/Header.js' %}"></script>
+    <script src="{% static 'js/utils/debouncing.js' %}"></script>
+    <script src="{% static 'js/api/Api.js' %}"></script>
+    <script src="{% static 'formRecipe.js' %}"></script>
+{% endblock %}
