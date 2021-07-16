@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.views.generic.list import ListView
-from recipes.models import Recipe, RecipeIngredient, Ingredient
+from recipes.models import Recipe, RecipeIngredient, Ingredient, Tag
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -98,6 +98,14 @@ def create_recipe(request):
                 ingredients[value] = request.POST[f"valueIngredient_{number}"]
         return ingredients
 
+    def get_tag():
+        name_tag = {"breakfast": "Завтрак", "lunch": "Обед", "dinner": "Ужин"}
+        tags = []
+        for key, value in request.POST.items():
+            if key in name_tag.keys():
+                tags.append(name_tag[key])
+        return tags
+
     if request.method != "POST":
         form = RecipeForm()
 
@@ -110,8 +118,10 @@ def create_recipe(request):
         recipe.author = request.user
         recipe.slug = create_slug(recipe.name)
         recipe.save()
-        for key, value in request.POST.items():
-            print(key, value)
+        tags = get_tag()
+        for name in tags:
+            tag = get_object_or_404(Tag, name=name)
+            recipe.tag.add(tag)
         ingredients = get_ingredient()
         for name in ingredients:
             ingredient = get_object_or_404(Ingredient, name=name)

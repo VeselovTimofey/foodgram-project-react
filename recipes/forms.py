@@ -1,13 +1,9 @@
-from recipes.models import Tag, Recipe, Ingredient
+from recipes.models import Recipe, Ingredient
 from django import forms
 
 
 class RecipeForm(forms.ModelForm):
-    all_tags = Tag.objects.all()
     all_ingredient = Ingredient.objects.all()
-    #tag = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(),
-     #                                    label="Теги",
-      #                                   widget=forms.CheckboxSelectMultiple())
 
     class Meta:
         model = Recipe

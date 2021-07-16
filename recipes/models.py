@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
+from recipes.validators import value_is_russia, value_is_not_null
 
 User = get_user_model()
 
@@ -36,12 +38,12 @@ class Tag(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name="author_recipe")
-    name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to="recipes/images/", blank=True, null=True)
-    description = models.TextField()
+    name = models.CharField(max_length=100, unique=True, validators=[value_is_russia])
+    image = models.ImageField(upload_to="recipes/", blank=True, null=True)
+    description = models.TextField(validators=[value_is_russia])
     ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient")
     tag = models.ManyToManyField(Tag, null=True, related_name="recipe_tag")
-    time_cooking = models.PositiveIntegerField()
+    time_cooking = models.PositiveIntegerField(validators=[value_is_not_null])
     slug = models.SlugField(unique=True, max_length=75)
     pub_date = models.DateTimeField(auto_now_add=True, db_index=True)
 
@@ -57,7 +59,7 @@ class RecipeIngredient(models.Model):
                                related_name="ingredients_in_recipe")
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
                                    related_name="ingredient_in_recipes")
-    count = models.PositiveIntegerField()
+    count = models.IntegerField(validators=[MinValueValidator(1)])
 
 
 class Favorite(models.Model):

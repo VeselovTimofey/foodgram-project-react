@@ -19,25 +19,34 @@
     <div class="form-container">
         <form class="form" method="post" action="{% url 'create_recipe' %}" enctype="multipart/form-data">
             {% csrf_token %}
+            {% for error in form.errors.values %}
+                <div class="form__error" role="alert">
+                    {{ error|escape }}
+                </div>
+            {% endfor %}
             <div class="form__group">
                 <label class="form__label">{{ form.name.label }}</label>
                 <div class="form__field-group">
                     {{ form.name }}
-                    <span class="form__error"></span>
                 </div>
             </div>
             <div class="form__group">
-                <p class="form__label">{{ form.tag.label }}</p>
+                <p class="form__label">Теги</p>
                 <div class="form__field-group">
                     <div class="tags">
-                        {% for tag in form.all_tags %}
-                            <div class="tags__item">
-                                <input type="checkbox" id="tag" class="tags__checkbox tags__checkbox_style_{{ tag.color }}">
-                                <label class="tags__label">{{ tag.name }}</label>
-                            </div>
-                        {% endfor %}
+                        <div class="tags__item">
+                            <input type="checkbox" name="breakfast" id="id_breakfast" class="tags__checkbox tags__checkbox_style_orange">
+                            <label for="id_breakfast" class="tags__label">Завтрак</label>
+                        </div>
+                        <div class="tags__item">
+                            <input type="checkbox" name="lunch" id="id_lunch" class="tags__checkbox tags__checkbox_style_green" checked>
+                            <label for="id_lunch" class="tags__label">Обед</label>
+                        </div>
+                        <div class="tags__item">
+                            <input type="checkbox" name="dinner" id="id_dinner" class="tags__checkbox tags__checkbox_style_purple" checked>
+                            <label for="id_dinner" class="tags__label">Ужин</label>
+                        </div>
                     </div>
-                    <span class="form__error"></span>
                 </div>
             </div>
             <div class="form__group">
@@ -57,7 +66,6 @@
                     </div>
                     <div class="form__field-group-ingredientes-container"></div>
                     <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
-                    <span class="form__error"></span>
                 </div>
             </div>
             <div class="form__group">
@@ -65,21 +73,18 @@
                 <div class="form__field-group form__field-group_time">
                     {{ form.time_cooking }}
                     <label class="form__label">минут</label>
-                    <span class="form__error"></span>
                 </div>
             </div>
             <div class="form__group">
                 <label class="form__label">{{ form.description.label }}</label>
                 <div class="form__field-group">
                     {{ form.description }}
-                    <span class="form__error"></span>
                 </div>
             </div>
             <div class="form__group">
                 <span class="form__label">{{ form.image.label }}</span>
                 <div class="form__field-group">
                     {{ form.image }}
-                    <span class="form__error"></span>
                 </div>
             </div>
             <div class="form__footer">
