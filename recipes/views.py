@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.views.generic.list import ListView
@@ -72,8 +73,26 @@ class RecipeDetailView(DetailView):
         return qs
 
 
-def create_recipe(request):
+def get_ingredient(request):
+    ingredients = {}
+    for key, value in request.POST.items():
+        if key.startswith("nameIngredient"):
+            number = key.split("_")[1]
+            ingredients[value] = request.POST[f"valueIngredient_{number}"]
+    return ingredients
 
+
+def get_tag(request):
+    name_tag = {"breakfast": "Завтрак", "lunch": "Обед", "dinner": "Ужин"}
+    tags = []
+    for key, value in request.POST.items():
+        if key in name_tag.keys():
+           tags.append(name_tag[key])
+    return tags
+
+
+@login_required
+def create_recipe(request):
     def create_slug(name):
         name = name.lower()
         alphabet = {"а": "a", "б": "b", "в": "f", "г": "g", "д": "d",
@@ -90,22 +109,6 @@ def create_recipe(request):
             slug += alphabet[n]
         return slug
 
-    def get_ingredient():
-        ingredients = {}
-        for key, value in request.POST.items():
-            if key.startswith("nameIngredient"):
-                number = key.split("_")[1]
-                ingredients[value] = request.POST[f"valueIngredient_{number}"]
-        return ingredients
-
-    def get_tag():
-        name_tag = {"breakfast": "Завтрак", "lunch": "Обед", "dinner": "Ужин"}
-        tags = []
-        for key, value in request.POST.items():
-            if key in name_tag.keys():
-                tags.append(name_tag[key])
-        return tags
-
     if request.method != "POST":
         form = RecipeForm()
 
@@ -118,11 +121,11 @@ def create_recipe(request):
         recipe.author = request.user
         recipe.slug = create_slug(recipe.name)
         recipe.save()
-        tags = get_tag()
+        tags = get_tag(request)
         for name in tags:
             tag = get_object_or_404(Tag, name=name)
             recipe.tag.add(tag)
-        ingredients = get_ingredient()
+        ingredients = get_ingredient(request)
         for name in ingredients:
             ingredient = get_object_or_404(Ingredient, name=name)
             RecipeIngredient.objects.create(recipe=recipe,
@@ -131,3 +134,32 @@ def create_recipe(request):
         return redirect(reverse("index"))
 
     return render(request, "templates/recipe_create.html", {"form": form})
+
+
+@login_required
+def update_recipe(request, username, slug):
+    if request.user.username != username:
+        return redirect(reverse("create_recipe"))
+    recipe = get_object_or_404(Recipe, slug=slug)
+    form = RecipeForm(request.POST or None, instance=recipe)
+    if request.method != "POST" or form.is_valid() is False:
+        return render(request, "recipe_update.html", {"form": form, "recipe": recipe})
+    form.save()
+    new_tags = get_tag(request)
+    for name in Tag.objects.all().name:
+        if (name in recipe.tag.name.all() and name in new_tags) or (name not in recipe.tag.name.all()
+                                                                    and name not in new_tags):
+            continue
+        elif name in recipe.tag.name.all() and name not in new_tags:
+            recipe.tag.filter(name=name).delete()
+        else:
+            tag = get_object_or_404(Tag, name=name)
+            recipe.tag.add(tag)
+    ingredients = get_ingredient(request)
+    RecipeIngredient.objects.filter(recipe=recipe).delete()
+    for name in ingredients:
+        ingredient = get_object_or_404(Ingredient, name=name)
+        RecipeIngredient.objects.create(recipe=recipe,
+                                        ingredient=ingredient,
+                                        count=ingredients[name])
+    return redirect(reverse("recipe", kwargs={"slug": slug}))
