@@ -74,6 +74,7 @@ class RecipeDetailView(DetailView):
 
 
 def get_ingredient(request):
+    """ This function return ingredients which the user has chosen from create_recipe or update_recipe page. """
     ingredients = {}
     for key, value in request.POST.items():
         if key.startswith("nameIngredient"):
@@ -83,6 +84,7 @@ def get_ingredient(request):
 
 
 def get_tag(request):
+    """ This function return tags which the user has chosen from create_recipe or update_recipe page. """
     name_tag = {"breakfast": "Завтрак", "lunch": "Обед", "dinner": "Ужин"}
     tags = []
     for key, value in request.POST.items():
@@ -94,6 +96,7 @@ def get_tag(request):
 @login_required
 def create_recipe(request):
     def create_slug(name):
+        """ This function return transcription names in Latin letters. """
         name = name.lower()
         alphabet = {"а": "a", "б": "b", "в": "f", "г": "g", "д": "d",
                     "е": "e", "ё": "e", "ж": "sh", "з": "z", "и": "i",
@@ -111,7 +114,6 @@ def create_recipe(request):
 
     if request.method != "POST":
         form = RecipeForm()
-
         return render(request, "templates/recipe_create.html", {"form": form})
 
     form = RecipeForm(request.POST or None, files=request.FILES or None)
@@ -137,24 +139,51 @@ def create_recipe(request):
 
 
 @login_required
-def update_recipe(request, username, slug):
-    if request.user.username != username:
-        return redirect(reverse("create_recipe"))
+def update_recipe(request, slug):
+    def get_old_tag():
+        """ This function return old tags from database. """
+        list_tag = []
+        for tag in Tag.objects.all():
+            recipe_in_tag = list(tag.recipe_tag.all())
+            if recipe in recipe_in_tag:
+                list_tag.append(tag.name)
+        return list_tag
+
+    def get_old_ingredient(recipe):
+        """ This function return old ingredients from database. """
+        list_ingredient = []
+        number_ingredient = 0
+        for ingredient in recipe.ingredient.all():
+            constituent_of_ingredient = []
+            constituent_of_ingredient.append(ingredient.name)
+            ingredient_count = list(recipe.ingredients_in_recipe.filter(ingredient=ingredient).values_list("count"))
+            constituent_of_ingredient.append(ingredient_count[0][0])
+            constituent_of_ingredient.append(ingredient.unit)
+            number_ingredient += 1
+            constituent_of_ingredient.append(number_ingredient)
+            list_ingredient.append(constituent_of_ingredient)
+        return list_ingredient
+
     recipe = get_object_or_404(Recipe, slug=slug)
+    list_tag = get_old_tag()
+    list_ingredient = get_old_ingredient(recipe=recipe)
+
+    if request.user != recipe.author:
+        return redirect(reverse("create_recipe"))
+
     form = RecipeForm(request.POST or None, instance=recipe)
+
     if request.method != "POST" or form.is_valid() is False:
-        return render(request, "recipe_update.html", {"form": form, "recipe": recipe})
+        return render(request, "templates/recipe_update.html",
+                      {"form": form, "recipe": recipe, "list_tag": list_tag, "list_ingredient": list_ingredient})
+
     form.save()
     new_tags = get_tag(request)
-    for name in Tag.objects.all().name:
-        if (name in recipe.tag.name.all() and name in new_tags) or (name not in recipe.tag.name.all()
-                                                                    and name not in new_tags):
-            continue
-        elif name in recipe.tag.name.all() and name not in new_tags:
-            recipe.tag.filter(name=name).delete()
-        else:
-            tag = get_object_or_404(Tag, name=name)
+    for tag in Tag.objects.all():
+        if tag.name in new_tags and tag.name not in list_tag:
             recipe.tag.add(tag)
+        elif tag.name not in new_tags and tag.name in list_tag:
+            recipe.tag.remove(tag)
     ingredients = get_ingredient(request)
     RecipeIngredient.objects.filter(recipe=recipe).delete()
     for name in ingredients:

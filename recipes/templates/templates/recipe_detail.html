@@ -14,7 +14,12 @@
 
 {% block content %}
     <div class="single-card" data-id="{{ recipe.id }}" data-author="{{ recipe.author.id }}">
-        <img src="{{ recipe.image }}" alt="{{ recipe.name }}" class="single-card__image">
+        <a href="{% url 'recipe' slug=recipe.slug %}" class="link" >
+            {% load thumbnail %}
+            {% thumbnail recipe.image "480x480" crop="center" upscale=True as im %}
+                <img src="{{ im.url }}" alt="{{ recipe.name }}" class="card__image">
+            {% endthumbnail %}
+        </a>
         <div class="single-card__info">
             <div class="single-card__header-info">
                 <h1 class="single-card__title">{{ recipe.name }}</h1>
@@ -44,12 +49,11 @@
                     </li>
                     {% if user == recipe.author %}
                         <li class="single-card__item">
-                            <a style="margin-left: 2.5em" href="#" class="single-card__text">Редактировать рецепт</a>
+                            <a style="margin-left: 2.5em" href="{% url 'update_recipe' recipe.slug %}" class="single-card__text">Редактировать рецепт</a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
-
             <div class="single-card__section">
                 <h3 class="single-card__section-title">Ингридиенты:</h3>
                 <div class="single-card__items single-card__items_column">
