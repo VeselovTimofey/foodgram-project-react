@@ -1,9 +1,10 @@
 {% extends "include/base.html" %}
 {% load static %}
+{% load separation_list %}
 
 
 {% block page_title %}
-    {{ recipe.name }}
+    {{ page_title }}
 {% endblock %}
 
 
@@ -32,8 +33,8 @@
             </div>
 
             <ul class="single-card__items">
-                {% for tag in recipe.tag.all %}
-                    <li class="single-card__item"><span class="badge badge_style_green">{{ tag.name }}</span></li>
+                {% for tag in tags %}
+                    <li class="single-card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
                 {% endfor %}
             </ul>
 
@@ -54,13 +55,21 @@
                     {% endif %}
                 </ul>
             </div>
+            <ul class="single-card__items">
+                {% if user != recipe.author %}
+                    <li class="single-card__item">
+                        <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
+                        <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
+                    </li>
+                {% endif %}
+            </ul>
             <div class="single-card__section">
                 <h3 class="single-card__section-title">Ингридиенты:</h3>
                 <div class="single-card__items single-card__items_column">
                     <ul class="card__items">
-                        {% for recipe_ingredient in recipe.ingredient_in_recipe.all %}
+                        {% for ingredient in ingredients %}
                             <li class=" single-card__section-item">
-                                {{ recipe_ingredient.ingredient.name }} - {{ ingredient_in_recipe.count }} {{ recipe_ingredient.ingredient.unit }}
+                                {{ ingredient|get_element:'0' }} - {{ ingredient|get_element:'1' }} {{ ingredient|get_element:'2' }}
                             </li>
                         {% endfor %}
                     </ul>

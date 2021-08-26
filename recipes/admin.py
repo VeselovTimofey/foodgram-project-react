@@ -1,5 +1,5 @@
 from django.contrib import admin
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Favorite, Tag
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Favorite, Tag, Subscribe, Purchase
 
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -33,7 +33,19 @@ class TagAdmin(admin.ModelAdmin):
     search_fields = ("name",)
 
 
+class SubscribeAdmin(admin.ModelAdmin):
+    fields = ("who_subscribes", "who_are_subscribed_to",)
+    list_filter = ("who_subscribes",)
+    search_fields = ("name", "who_are_subscribed_to",)
+
+
+class PurchaseAdmin(admin.ModelAdmin):
+    fields = ("purchaser", "purchases")
+
+
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(Subscribe, SubscribeAdmin)
+admin.site.register(Purchase, PurchaseAdmin)

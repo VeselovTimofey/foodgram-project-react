@@ -17,16 +17,6 @@ class Ingredient(models.Model):
         ordering = ("name",)
 
 
-class RecipeQuerySet(models.QuerySet):
-    def with_is_favorite(self, user_id):
-        return self.annotate(is_favorite=models.Exists(
-            Favorite.objects.filter(
-                user_id=user_id,
-                recipe_id=models.OuterRef("pk"),
-            ),
-        ))
-
-
 class Tag(models.Model):
     name = models.CharField(max_length=50)
     color = models.CharField(max_length=50, default="orange")
@@ -76,3 +66,28 @@ class Favorite(models.Model):
             fields=("user", "recipe"),
             name="unique_favorite_user_recipe"
         )]
+
+
+class Subscribe(models.Model):
+    who_subscribes = models.ForeignKey(User, on_delete=models.CASCADE,
+                                       related_name="who_subscribes")
+    who_are_subscribed_to = models.ForeignKey(User, on_delete=models.CASCADE,
+                                              related_name="subscriptions")
+
+    def __str__(self):
+        return f"{self.who_subscribes} subscribe on {self.who_are_subscribed_to}"
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=("who_subscribes", "who_are_subscribed_to"),
+            name="unique_subscribe"
+        )]
+
+
+class Purchase(models.Model):
+    purchaser = models.OneToOneField(User, on_delete=models.CASCADE,
+                                     related_name="user_purchase")
+    purchases = models.ManyToManyField(Recipe, related_name="recipe_purchase")
+
+    def __str__(self):
+        return f"Purchase {self.purchaser}"

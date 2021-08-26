@@ -1,0 +1,20 @@
+{% extends "include/base.html" %}
+{% load static %}
+
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
+
+{% block static_css %}
+    <link rel="stylesheet" href="{% static 'pages/index.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="form-container">
+        <h3 class="form__label">Данный сайт написал Веселов Тимофей.</h3>
+        <h3 class="form__label">Если вы нашли какую-нибудь ошибку, пожалуйста, отпишитесь на vestimofey@mail.ru.</h3>
+    </div>
+{% endblock %}

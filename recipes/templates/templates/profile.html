@@ -1,6 +1,10 @@
 {% extends "templates/index.html" %}
 {% load static %}
 
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
 {% block static_js %}
     <script src="{% static 'js/components/MainCards.js' %}"></script>
 

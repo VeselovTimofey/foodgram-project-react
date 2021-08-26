@@ -2,75 +2,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.views.generic.list import ListView
-from recipes.models import Recipe, RecipeIngredient, Ingredient, Tag
+from recipes.models import Recipe, RecipeIngredient, Ingredient, Tag, Purchase
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.template.backends import django
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from .forms import RecipeForm
+from django.core.paginator import Paginator
 
 User = get_user_model()
-
-
-class BaseRecipeListView(ListView):
-    """ Base view for Recipes list. """
-    context_object_name = "recipe_list"
-    queryset = Recipe.objects.all()
-    paginate_by = 6
-    page_title = None
-
-    def get_context_data(self, **kwargs):
-        kwargs.update({"page_title": self._get_page_title()})
-        return super().get_context_data(**kwargs)
-
-    def _get_page_title(self):
-        assert self.page_title, f"Attribute 'page_title' not set for {self.__class__.__name__}"
-        return self.page_title
-
-
-class IndexView(BaseRecipeListView):
-    """ Main page that displays list of Recipes. """
-    page_title = "Recipes"
-    template_name = "templates/index.html"
-
-
-class FavoriteView(LoginRequiredMixin, BaseRecipeListView):
-    """ List of current user`s favorite Recipes. """
-    page_title = "Recipes"
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.filter(favorites_user=self.request.user)
-        return qs
-
-
-class ProfileView(BaseRecipeListView):
-    """ User`s page with its name and list of authored Recipes. """
-    template_name = "templates/profile.html"
-
-    def get(self, request, *args, **kwargs):
-        self.user = get_object_or_404(User, username=kwargs.get("username"))
-        return super().get(self, request, *args, **kwargs)
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.filter(author=self.user)
-        return qs
-
-    def _get_page_title(self):
-        return self.user.get_full_name()
-
-
-class RecipeDetailView(DetailView):
-    """Page with Recipe details."""
-    queryset = Recipe.objects.all()
-    template_name = "templates/recipe_detail.html"
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        #qs = qs.with_is_favorite(user_id=self.request.user.id)
-        return qs
 
 
 def get_ingredient(request):
@@ -93,6 +35,170 @@ def get_tag(request):
     return tags
 
 
+def get_old_ingredient(recipe):
+    """ This function return old ingredients from database. """
+    list_ingredient = []
+    number_ingredient = 0
+    for ingredient in recipe.ingredient.all():
+        constituent_of_ingredient = []
+        constituent_of_ingredient.append(ingredient.name)
+        ingredient_count = list(recipe.ingredients_in_recipe.filter(ingredient=ingredient).values_list("count"))
+        constituent_of_ingredient.append(ingredient_count[0][0])
+        constituent_of_ingredient.append(ingredient.unit)
+        number_ingredient += 1
+        constituent_of_ingredient.append(number_ingredient)
+        list_ingredient.append(constituent_of_ingredient)
+    return list_ingredient
+
+
+def get_old_tag(recipe):
+    """ This function return names of old tags from database. """
+    list_tag = []
+    for tag in Tag.objects.all():
+        recipe_in_tag = list(tag.recipe_tag.all())
+        if recipe in recipe_in_tag:
+            list_tag.append(tag)
+    return list_tag
+
+
+def get_old_purchase(purchaser):
+    """ This function return list with user purchase. """
+    purchase = Purchase.objects.get_or_create(purchaser=purchaser)
+    return purchase[0].purchases.all()
+
+
+def get_old_favorite(user):
+    """ This function return list with user favorite. """
+    list_favorite = user.user_favorite.all()
+    list_favorite_name = []
+    for favorite in list_favorite:
+        list_favorite_name.append(favorite.recipe)
+    return list_favorite_name
+
+
+def index(request):
+    """ Main page that displays list of Recipes. """
+    recipes = Recipe.objects.all()
+    page_title = "Рецепты"
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/index.html", {"page_obj": page_obj,
+                                                        "page_title": page_title, "list_purchase": list_purchase,
+                                                        "list_favorite_name": list_favorite_name})
+    return render(request, "templates/index.html", {"page_obj": page_obj, "page_title": page_title})
+
+
+def tags_page(request, tag):
+    page_title = tag
+    tags = ["Завтрак", "Обед", "Ужин"]
+    if tag not in tags:
+        return redirect(reverse("create_recipe"))
+    recipes = Recipe.objects.filter(tag__name=tag)
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/index.html", {"page_obj": page_obj,
+                                                        "page_title": page_title, "list_purchase": list_purchase,
+                                                        "list_favorite_name": list_favorite_name})
+    return render(request, "templates/index.html", {"page_obj": page_obj, "page_title": page_title})
+
+
+def recipe_detail(request, slug):
+    """ Recipe page that displays components of recipe. """
+    recipe = get_object_or_404(Recipe, slug=slug)
+    list_ingredient = get_old_ingredient(recipe=recipe)
+    list_tag = get_old_tag(recipe=recipe)
+    page_title = recipe.name
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/recipe_detail.html",  {"recipe": recipe, "ingredients": list_ingredient,
+                                                                 "tags": list_tag, "page_title": page_title,
+                                                                 "list_purchase": list_purchase,
+                                                                 "list_favorite_name": list_favorite_name})
+    return render(request, "templates/recipe_detail.html", {"recipe": recipe, "ingredients": list_ingredient,
+                                                            "tags": list_tag, "page_title": page_title})
+
+
+@login_required
+def favorite_page(request):
+    """ Favorite page that displays list of favorite recipes. """
+    page_title = "Избранное"
+    recipes = Recipe.objects.filter(favorite_recipe__user__username=request.user)
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    list_purchase = get_old_purchase(request.user)
+    list_favorite_name = get_old_favorite(request.user)
+    return render(request, "templates/index.html", {"page_obj": page_obj,
+                                                    "page_title": page_title, "list_purchase": list_purchase,
+                                                    "list_favorite_name": list_favorite_name})
+
+
+def user_page(request, username):
+    """ User page that display list of user recipes. """
+    page_title = username
+    recipes = Recipe.objects.filter(author__username=username)
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/profile.html", {"page_obj": page_obj,
+                                                          "page_title": page_title, "list_purchase": list_purchase,
+                                                          "list_favorite_name": list_favorite_name})
+    return render(request, "templates/profile.html", {"page_obj": page_obj, "page_title": page_title})
+
+
+@login_required
+def subscribe_page(request):
+    """ List of current user`s Subscribe. """
+    page_title = "Мои подписки"
+    subscribe_list = []
+    for user in User.objects.filter(subscriptions__who_subscribes__username=request.user):
+        constituent_of_subscripe = []
+        constituent_of_subscripe.append(user)
+        user_recipe = user.author_recipe.all()
+        if user_recipe.count() > 3:
+            constituent_of_subscripe.append(user_recipe[:3])
+            constituent_of_subscripe.append(user_recipe.count() - 3)
+        else:
+            constituent_of_subscripe.append(user_recipe)
+            constituent_of_subscripe.append(0)
+        subscribe_list.append(constituent_of_subscripe)
+    paginator = Paginator(subscribe_list, 3)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    list_purchase = get_old_purchase(request.user)
+    list_favorite_name = get_old_favorite(request.user)
+    return render(request, "templates/my_subscribe.html", {"page_obj": page_obj, "page_title": page_title,
+                                                           "list_purchase": list_purchase,
+                                                           "list_favorite_name": list_favorite_name})
+
+
+@login_required
+def purchase_page(request):
+    """ List of current user`s Purchase """
+    page_title = "Список покупок"
+    recipes = Purchase.objects.get(purchaser=request.user).purchases.all()
+    paginator = Paginator(recipes, 3)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    list_purchase = get_old_purchase(request.user)
+    list_favorite_name = get_old_favorite(request.user)
+    return render(request, "templates/purchase.html", {"page_obj": page_obj, "page_title": page_title,
+                                                       "list_purchase": list_purchase,
+                                                       "list_favorite_name": list_favorite_name})
+
+
 @login_required
 def create_recipe(request):
     def create_slug(name):
@@ -112,9 +218,15 @@ def create_recipe(request):
             slug += alphabet[n]
         return slug
 
+    page_title = "Создать рецепт"
+    list_purchase = get_old_purchase(request.user)
+    list_favorite_name = get_old_favorite(request.user)
+
     if request.method != "POST":
         form = RecipeForm()
-        return render(request, "templates/recipe_create.html", {"form": form})
+        return render(request, "templates/recipe_create.html", {"form": form, "page_title": page_title,
+                                                                "list_purchase": list_purchase,
+                                                                "list_favorite_name": list_favorite_name})
 
     form = RecipeForm(request.POST or None, files=request.FILES or None)
 
@@ -135,37 +247,21 @@ def create_recipe(request):
                                             count=ingredients[name])
         return redirect(reverse("index"))
 
-    return render(request, "templates/recipe_create.html", {"form": form})
+    return render(request, "templates/recipe_create.html", {"form": form, "page_title": page_title,
+                                                            "list_purchase": list_purchase,
+                                                            "list_favorite_name": list_favorite_name})
 
 
 @login_required
 def update_recipe(request, slug):
-    def get_old_tag():
-        """ This function return old tags from database. """
-        list_tag = []
-        for tag in Tag.objects.all():
-            recipe_in_tag = list(tag.recipe_tag.all())
-            if recipe in recipe_in_tag:
-                list_tag.append(tag.name)
-        return list_tag
-
-    def get_old_ingredient(recipe):
-        """ This function return old ingredients from database. """
-        list_ingredient = []
-        number_ingredient = 0
-        for ingredient in recipe.ingredient.all():
-            constituent_of_ingredient = []
-            constituent_of_ingredient.append(ingredient.name)
-            ingredient_count = list(recipe.ingredients_in_recipe.filter(ingredient=ingredient).values_list("count"))
-            constituent_of_ingredient.append(ingredient_count[0][0])
-            constituent_of_ingredient.append(ingredient.unit)
-            number_ingredient += 1
-            constituent_of_ingredient.append(number_ingredient)
-            list_ingredient.append(constituent_of_ingredient)
-        return list_ingredient
-
     recipe = get_object_or_404(Recipe, slug=slug)
-    list_tag = get_old_tag()
+    page_title = f"Изменение рецепта {recipe.name}"
+    list_purchase = get_old_purchase(request.user)
+    list_favorite_name = get_old_favorite(request.user)
+    tags = get_old_tag(recipe=recipe)
+    list_tag = []
+    for tag in tags:
+        list_tag.append(tag.name)
     list_ingredient = get_old_ingredient(recipe=recipe)
 
     if request.user != recipe.author:
@@ -175,7 +271,10 @@ def update_recipe(request, slug):
 
     if request.method != "POST" or form.is_valid() is False:
         return render(request, "templates/recipe_update.html",
-                      {"form": form, "recipe": recipe, "list_tag": list_tag, "list_ingredient": list_ingredient})
+                      {"form": form, "recipe": recipe, "list_tag": list_tag,
+                       "list_ingredient": list_ingredient, "page_title": page_title,
+                       "list_purchase": list_purchase,
+                       "list_favorite_name": list_favorite_name})
 
     form.save()
     new_tags = get_tag(request)
@@ -192,3 +291,51 @@ def update_recipe(request, slug):
                                         ingredient=ingredient,
                                         count=ingredients[name])
     return redirect(reverse("recipe", kwargs={"slug": slug}))
+
+
+def registration_request(request):
+    page_title = "Необходима регистрация"
+    return render(request, "templates/registration_request.html", {"page_title": page_title})
+
+
+def author_page(request):
+    page_title = "Об авторе"
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/author_page.html", {"page_title": page_title, "list_purchase": list_purchase,
+                                                              "list_favorite_name": list_favorite_name})
+    return render(request, "templates/author_page.html", {"page_title": page_title})
+
+
+def technology_page(request):
+    page_title = "Технологии"
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/technology_page.html", {"page_title": page_title,
+                                                                  "list_purchase": list_purchase,
+                                                                  "list_favorite_name": list_favorite_name})
+    return render(request, "templates/technology_page.html", {"page_title": page_title})
+
+
+def page_not_found(request):
+    page_title = "Страница не найдена"
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/404.html", {"page_title": page_title,
+                                                      "list_purchase": list_purchase,
+                                                      "list_favorite_name": list_favorite_name})
+    return render(request, "templates/404.html", {"page_title": page_title})
+
+
+def server_error(request):
+    page_title = "Ошибка сервера"
+    if request.user.is_authenticated:
+        list_purchase = get_old_purchase(request.user)
+        list_favorite_name = get_old_favorite(request.user)
+        return render(request, "templates/500.html", {"page_title": page_title,
+                                                      "list_purchase": list_purchase,
+                                                      "list_favorite_name": list_favorite_name})
+    return render(request, "templates/500.html", {"page_title": page_title})
