@@ -25,7 +25,9 @@
             <div class="single-card__header-info">
                 <h1 class="single-card__title">{{ recipe.name }}</h1>
                 <div class="single-card__favorite">
-                    {% include 'include/favorite_button.html' %}
+                    {% if user.is_authenticated %}
+                        {% include 'include/favorite_button.html' %}
+                    {% endif %}
                     <div class="single-card__favorite-tooltip tooltip">
                         {% if user.is_authenticated and recipe.is_favorite %}Убрать из избранного{% else %}Добавить в избранное{% endif %}
                     </div>

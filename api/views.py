@@ -1,12 +1,12 @@
-from rest_framework import status, renderers
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.generics import ListAPIView
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from recipes.models import Favorite, Ingredient, Subscribe, Purchase, Recipe
-from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from rest_framework import status
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from recipes.models import Favorite, Ingredient, Purchase, Recipe, Subscribe
+
 from .serializers import IngredientSerializer
 
 

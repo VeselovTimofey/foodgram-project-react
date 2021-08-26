@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-from recipes.validators import value_is_russia, value_is_not_null
+
+from recipes.validators import value_is_not_null, value_is_russia
 
 User = get_user_model()
 
@@ -28,7 +29,8 @@ class Tag(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name="author_recipe")
-    name = models.CharField(max_length=100, unique=True, validators=[value_is_russia])
+    name = models.CharField(max_length=100, unique=True,
+                            validators=[value_is_russia])
     image = models.ImageField(upload_to="recipes/", blank=True, null=True)
     description = models.TextField()
     ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient")
@@ -75,7 +77,8 @@ class Subscribe(models.Model):
                                               related_name="subscriptions")
 
     def __str__(self):
-        return f"{self.who_subscribes} subscribe on {self.who_are_subscribed_to}"
+        return (f"{self.who_subscribes} subscribe"
+                f" on {self.who_are_subscribed_to}")
 
     class Meta:
         constraints = [models.UniqueConstraint(

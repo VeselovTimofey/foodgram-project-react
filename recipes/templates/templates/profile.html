@@ -5,6 +5,43 @@
     {{ page_title }}
 {% endblock %}
 
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">{{ page_title }}</h1>
+        {% if page_title != "Избранное" %}
+            <ul class="tags">
+                <li class="tags__item">
+                    <a id="breakfast" class="tags__checkbox tags__checkbox_style_orange tags__checkbox_active"
+                       href="{% url 'author_tag' tag='Завтрак' author=author %}">
+                    </a>
+                    <span class="tags__label">Завтрак</span>
+                </li>
+                <li class="tags__item">
+                    <a id="lunch" class="tags__checkbox tags__checkbox_style_green tags__checkbox_active"
+                        href="{% url 'author_tag' tag='Обед' author=author %}">
+                    </a>
+                    <span for="lunch" class="tags__label">Обед</span>
+                </li>
+                <li class="tags__item">
+                    <a id="dinner" class="tags__checkbox tags__checkbox_style_purple tags__checkbox_active"
+                        href="{% url 'author_tag' tag='Ужин' author=author %}">
+                    </a>
+                    <label for="dinner" class="tags__label">Ужин</label>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+    <div class="card-list">
+        {% for recipe in page_obj %}
+            {% include "include/recipe_card.html" %}
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        {% include "include/paginator.html" with items=page_obj paginator=paginator %}
+    {% endif %}
+{% endblock %}
+
 {% block static_js %}
     <script src="{% static 'js/components/MainCards.js' %}"></script>
 
