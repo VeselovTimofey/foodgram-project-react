@@ -1,0 +1,45 @@
+{% extends "include/base.html" %}
+{% load static %}
+
+{% block page_title %}
+    Вход на сайт
+{% endblock %}
+
+{% block static_css %}
+    <link rel="stylesheet" href="{% static 'pages/form.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% load user_filters %}
+    <div class="main__header">
+        <h1 class="main__title">Войти на сайт</h1>
+    </div>
+    <div class="form-container">
+        <form class="form" method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form__group">
+                <label class="form__label">Имя</label>
+                <div class="form__field-group">
+                    {{ form.username|addclass:"form__input" }}
+                </div>
+            </div>
+            <div class="form__group">
+                <label class="form__label">Пароль</label>
+                <div class="form__field-group">
+                    {{ form.password|addclass:"form__input" }}
+                </div>
+            </div>
+            <div class="form__footer">
+                <button type="submit" class="button button_style_blue">Войти</button>
+                <a href="{% url 'password_reset' %}" class="form__forgot-link">
+                    Забыли пароль?
+                </a>
+            </div>
+            {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    Имя пользователя и пароль не совпадают. Введите правильные данные.
+                </div>
+            {% endif %}
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,11 @@
+<nav class="pagination" aria-label="Search results pages">
+    <ul class="pagination__container">
+        {% if items.has_previous %}
+            <li class="pagination__item"><a class="pagination__link link" href="?page={{ items.previous_page_number }}"><<</a></li>
+        {% endif %}
+        <li class="pagination__item">{{ items.number }}</li>
+        {% if items.has_next %}
+            <li class="pagination__item"><a class="pagination__link link" href="?page={{ items.next_page_number }}">>></a></li>
+        {% endif %}
+    </ul>
+</nav>

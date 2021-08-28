@@ -1,0 +1,25 @@
+{% extends "include/base.html" %}
+{% load static %}
+
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
+
+{% block static_css %}
+    <link rel="stylesheet" href="{% static 'pages/index.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="form-container">
+        <h3 class="form__label">Данный сайт написан с использованием технологий:</h3>
+        <h3 class="form__label">Python - 3.9</h3>
+        <h3 class="form__label">Django - 3.2.3</h3>
+        <h3 class="form__label">PostgreSQL - 13.3</h3>
+        <h3 class="form__label">Gunicorn - 20.1.0</h3>
+        <h3 class="form__label">Nginx - 1.21.0</h3>
+        <h3 class="form__label">Docker - 20.10.5</h3>
+    </div>
+{% endblock %}

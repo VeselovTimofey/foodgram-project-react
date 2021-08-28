@@ -1,0 +1,52 @@
+{% extends "include/base.html" %}
+{% load static %}
+{% load thumbnail %}
+
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
+
+{% block static_css %}
+    <link rel="stylesheet" href="{% static 'pages/shopList.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">{{ page_title }}</h1>
+    </div>
+    <div class="card-list card-list_column">
+        <ul class="shopping-list">
+            {% for recipe in page_obj %}
+                <li class="shopping-list__item" data-id="{{ recipe.id }}">
+                    <div class="recipe recipe_reverse">
+                        {% thumbnail recipe.image "100x50" crop="center" upscale=True as im %}
+                            <img src="{{ im.url }}" alt="{{ recipe.name }}" class="card__image">
+                        {% endthumbnail %}
+                        <h3 class="recipe__title">{{ recipe.name }}</h3>
+                        <p class="recipe__text"><span class="icon-time"></span> {{ recipe.time_cooking }} мин.</p>
+                    </div>
+                    <a href="#" class="shopping-list__button link">Удалить</a>
+                </li>
+            {% endfor %}
+            {% if page_obj.has_other_pages %}
+                {% include "include/paginator.html" with items=page_obj paginator=paginator %}
+            {% endif %}
+        </ul>
+        <a href="{% url 'add_to_purchase' %}"><button class="button button_style_blue">Скачать список</button></a>
+    </div>
+{% endblock %}
+
+
+{% block static_js %}
+  <script src="{% static 'js/components/ShopList.js' %}"></script>
+  <script src="{% static 'js/components/Header.js' %}"></script>
+
+  <script src="{% static 'js/config/config.js' %}"></script>
+
+  <script src="{% static 'js/api/Api.js' %}"></script>
+
+  <script src="{% static 'shopList.js' %}"></script>
+{% endblock %}
