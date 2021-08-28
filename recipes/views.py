@@ -328,6 +328,15 @@ def update_recipe(request, slug):
     return redirect(reverse("recipe", kwargs={"slug": slug}))
 
 
+@login_required
+def delete_recipe(request, slug):
+    """ This function delete recipe and redirect to main page. """
+    recipe = get_object_or_404(Recipe, slug=slug)
+    if request.user == recipe.author:
+        recipe.delete()
+    return redirect(reverse("index"))
+
+
 def registration_request(request):
     """ If user tries to get to login_required page, he gets on this page. """
     page_title = "Необходима регистрация"
