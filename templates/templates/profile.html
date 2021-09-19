@@ -1,0 +1,37 @@
+{% extends "templates/index.html" %}
+{% load static %}
+
+{% block page_title %}
+    {{ page_title }}
+{% endblock %}
+
+{% block content %}
+    <div class="main__header">
+        <h1 class="main__title">{{ page_title }}</h1>
+        {% include "include/tag.html" %}
+    </div>
+    <div class="card-list">
+        {% for recipe in page_obj %}
+            {% include "include/recipe_card.html" %}
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        {% include "include/paginator.html" with items=page_obj paginator=paginator %}
+    {% endif %}
+{% endblock %}
+
+{% block static_js %}
+    <script src="{% static 'js/components/MainCards.js' %}"></script>
+
+    <script src="{% static 'js/components/Purchases.js' %}"></script>
+    <script src="{% static 'js/components/Favorites.js' %}"></script>
+    <script src="{% static 'js/components/Subscribe.js' %}"></script>
+
+    <script src="{% static 'js/config/config.js' %}"></script>
+    <script src="{% static 'js/components/AuthorRecipe.js' %}"></script>
+    <script src="{% static 'js/components/Header.js' %}"></script>
+
+    <script src="{% static 'js/api/Api.js' %}"></script>
+    <script src="{% static 'authorRecipe.js' %}"></script>
+{% endblock %}

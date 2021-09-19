@@ -19,7 +19,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_display = ("name", "author", "pub_date")
     search_fields = ("name",)
     list_filter = ("author",)
-    autocomplete_fields = ("ingredient",)
+    autocomplete_fields = ("ingredients",)
     inlines = [IngredientInline]
 
 

@@ -1,6 +1,6 @@
 {% extends "include/base.html" %}
 {% load static %}
-{% load separation_list %}
+{% load get_three_objects %}
 {% load thumbnail %}
 
 
@@ -20,15 +20,14 @@
     </div>
     <div class="card-list">
         {% for subscribe in page_obj %}
-            {% tag_get_element subscribe "0" as user %}
             <div class="card-user" data-author="{{ user.id }}">
                 <div class="card-user__header">
-                    <h2 class="card-user__title">{{ user.username }}</h2>
+                    <h2 class="card-user__title">{{ subscribe.username }}</h2>
                 </div>
                 <div class="card-user__body">
                     <ul class="card-user__items">
-                        {% tag_get_element subscribe "1" as recipes %}
-                        {% for recipe in recipes %}
+                        {% tag_get_three_objects subscribe.recipes.all as three_recipes %}
+                        {% for recipe in three_recipes %}
                             <li class="card-user__item">
                                 <div class="recipe">
                                     {% thumbnail recipe.image "100x50" crop="center" upscale=True as im %}
@@ -39,10 +38,9 @@
                                 </div>
                             </li>
                         {% endfor %}
-                        {% tag_get_element subscribe "2" as other_recipe %}
-                        {% if other_recipe != 0 %}
+                        {% if subscribe.recipes.count > 3 %}
                             <li class="card-user__item">
-                                <a href="{% url 'profile' username=user.username %}" class="card-user__link link">Еще {{ other_recipe }} рецептов...</a>
+                                <a href="{% url 'profile' username=subscribe.username %}" class="card-user__link link">Еще {{ subscribe.recipes.all.count|add:-3 }} рецептов...</a>
                             </li>
                         {% endif %}
                     </ul>

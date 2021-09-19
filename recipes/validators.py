@@ -17,8 +17,7 @@ def value_is_russia(value):
             )
 
 
-def value_is_not_null(value):
-    # value is not null
+def value_must_not_be_null(value):
     if value == 0:
         raise forms.ValidationError(
             "Значение не может быть нулём.",
