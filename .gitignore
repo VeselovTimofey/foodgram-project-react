@@ -133,3 +133,6 @@ dmypy.json
 /static
 /static_things
 /media
+
+#PyCharm settings
+/.idea

@@ -1,0 +1,34 @@
+{% if page_title != "Избранное" %}
+    <ul class="tags">
+        <li class="tags__item">
+            <a id="breakfast" class="tags__checkbox tags__checkbox_style_orange tags__checkbox_active"
+                {% if not author %}
+                    href="{% url 'tag' tag='Завтрак' %}">
+                {% else %}
+                    href="{% url 'author_tag' tag='Завтрак' author=author %}">
+                {% endif %}
+            </a>
+            <span class="tags__label">Завтрак</span>
+        </li>
+        <li class="tags__item">
+            <a id="lunch" class="tags__checkbox tags__checkbox_style_green tags__checkbox_active"
+                {% if not author %}
+                    href="{% url 'tag' tag='Обед' %}">
+                {% else %}
+                    href="{% url 'author_tag' tag='Обед' author=author %}">
+                {% endif %}
+            </a>
+            <span for="lunch" class="tags__label">Обед</span>
+        </li>
+        <li class="tags__item">
+            <a id="dinner" class="tags__checkbox tags__checkbox_style_purple tags__checkbox_active"
+                {% if not author %}
+                    href="{% url 'tag' tag='Ужин' %}">
+                {% else %}
+                    href="{% url 'author_tag' tag='Ужин' author=author %}">
+                {% endif %}
+            </a>
+            <label for="dinner" class="tags__label">Ужин</label>
+        </li>
+    </ul>
+{% endif %}

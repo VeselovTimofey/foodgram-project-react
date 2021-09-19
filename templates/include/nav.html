@@ -3,31 +3,36 @@
         <div class="nav__container container">
             <ul class="nav__items list">
                 {% if page_title == "Рецепты" %}
-                    <li class="nav__item nav__item_active"><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
+                    <li class="nav__item nav__item_active">
                 {% else %}
-                    <li class="nav__item"><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
+                    <li class="nav__item">
                 {% endif %}
+                <a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
                 {% if user.is_authenticated %}
-                    {% if page_title == "Подписки" %}
-                        <li class="nav__item nav__item_active"><a href="{% url 'subscribe' %}" class="nav__link link">Мои подписки</a></li>
+                    {% if page_title == "Мои подписки" %}
+                        <li class="nav__item nav__item_active">
                     {% else %}
-                        <li class="nav__item"><a href="{% url 'subscribe' %}" class="nav__link link">Мои подписки</a></li>
+                        <li class="nav__item">
                     {% endif %}
+                    <a href="{% url 'subscribe' %}" class="nav__link link">Мои подписки</a></li>
                     {% if page_title == "Создать рецепт" %}
-                        <li class="nav__item nav__item_active"><a href="{% url 'create_recipe' %}" class="nav__link link">Создать рецепт</a></li>
+                        <li class="nav__item nav__item_active">
                     {% else %}
-                        <li class="nav__item"><a href="{% url 'create_recipe' %}" class="nav__link link">Создать рецепт</a></li>
+                        <li class="nav__item">
                     {% endif %}
+                    <a href="{% url 'create_recipe' %}" class="nav__link link">Создать рецепт</a></li>
                     {% if page_title == "Избранное" %}
-                        <li class="nav__item nav__item_active"><a href="{% url 'favorite' %}" class="nav__link link">Избранное</a></li>
+                        <li class="nav__item nav__item_active">
                     {% else %}
-                        <li class="nav__item"><a href="{% url 'favorite' %}" class="nav__link link">Избранное</a></li>
+                        <li class="nav__item">
                     {% endif %}
+                    <a href="{% url 'favorite' %}" class="nav__link link">Избранное</a></li>
                     {% if page_title == "Список покупок" %}
-                        <li class="nav__item nav__item_active"><a href="{% url 'purchase' %}" class="nav__link link">Список покупок <span class="badge badge_style_blue nav__badge" id="counter">{{ list_purchase|length }}</span></a></li>
+                        <li class="nav__item nav__item_active">
                     {% else %}
-                        <li class="nav__item"><a href="{% url 'purchase' %}" class="nav__link link">Список покупок <span class="badge badge_style_blue nav__badge" id="counter">{{ list_purchase|length }}</span></a></li>
+                        <li class="nav__item">
                     {% endif %}
+                    <a href="{% url 'purchase' %}" class="nav__link link">Список покупок <span class="badge badge_style_blue nav__badge" id="counter">{{ list_purchases|length }}</span></a></li>
                 {% else %}
                     <li class="nav__item nav__item_disabled"><a href="{% url 'registration_request' %}" class="nav__link link">Мои подписки</a></li>
                     <li class="nav__item nav__item_disabled"><a href="{% url 'registration_request' %}" class="nav__link link">Создать рецепт</a></li>

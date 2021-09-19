@@ -35,7 +35,7 @@
             </div>
 
             <ul class="single-card__items">
-                {% for tag in tags %}
+                {% for tag in recipe.tags.all %}
                     <li class="single-card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
                 {% endfor %}
             </ul>
