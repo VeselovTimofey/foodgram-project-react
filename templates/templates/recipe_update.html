@@ -1,4 +1,4 @@
-{% extends "include/base.html" %}
+{% extends "templates/base.html" %}
 {% load static %}
 {% load separation_list %}
 
@@ -68,7 +68,7 @@
                     <div class="form__field-group-ingredientes">
                         <div class="form__dropdown">
                             <select class="form__input" id="nameIngredient">
-                                {% for ingredient in form.all_ingredient %}
+                                {% for ingredient in form.all_ingredients %}
                                     <option>{{ ingredient.name }}</option>
                                 {% endfor %}
                             </select>

@@ -1,10 +1,11 @@
 from django import forms
 
-from recipes.models import Ingredient, Recipe
+from recipes.models import Ingredient, Recipe, Tag
 
 
 class RecipeForm(forms.ModelForm):
-    all_ingredient = Ingredient.objects.all()
+    all_ingredients = Ingredient.objects.all()
+    all_tags = Tag.objects.all()
 
     class Meta:
         model = Recipe

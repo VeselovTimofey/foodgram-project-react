@@ -130,9 +130,11 @@ dmypy.json
 .pyre/
 
 #static
-/static
-/static_things
-/media
+static/
+static_things/
+media/
 
 #PyCharm settings
-/.idea
+.idea/
+
+file/

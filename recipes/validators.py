@@ -23,3 +23,7 @@ def value_must_not_be_null(value):
             "Значение не может быть нулём.",
             params={"value": value},
         )
+
+
+def value_is_not_null(value):
+    pass
