@@ -1,5 +1,7 @@
-{% if recipe in list_purchases %}
-    <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span>Рецепт добавлен</button>
-{% else %}
-    <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-{% endif %}
+<button name="purchases"
+        {% if recipe in list_purchases %}
+            class="button button_style_light-blue-outline"><span class="icon-check button__icon"></span>Рецепт добавлен
+        {% else %}
+            class="button button_style_light-blue" data-out><span class="icon-plus button__icon"></span>Добавить в покупки
+        {% endif %}
+</button>

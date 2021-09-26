@@ -11,7 +11,6 @@ from rest_framework.views import APIView
 
 from recipes.models import (Favorite, Ingredient, Purchase, Recipe,
                             RecipeIngredient, Subscribe)
-
 from .filters import IngredientFilter
 from .serializers import IngredientSerializer
 
@@ -21,7 +20,7 @@ class ApiFavorites(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, format=None):
-        recipe_id = request.data.get("id", None)
+        recipe_id = request.data.get("id")
         if not recipe_id:
             return Response({"success": False},
                             status=status.HTTP_404_NOT_FOUND)
@@ -50,7 +49,7 @@ class ApiSubscribe(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, format=None):
-        who_are_subscribed_to_id = request.data.get("id", None)
+        who_are_subscribed_to_id = request.data.get("id")
         if not who_are_subscribed_to_id:
             return Response({"success": False},
                             status=status.HTTP_404_NOT_FOUND)
@@ -82,7 +81,7 @@ class ApiPurchase(APIView):
         ingredients = {}
         for ingredient in ingredients_in_recipe:
             name = f"{ingredient.ingredient.name},{ingredient.ingredient.unit}"
-            if name in ingredients.keys():
+            if name in ingredients:
                 ingredients[name] += ingredient.count
             else:
                 ingredients[name] = ingredient.count
@@ -101,7 +100,7 @@ class ApiPurchase(APIView):
     def post(self, request, format=None):
         Purchase.objects.get_or_create(purchaser=request.user)
         purchase = get_object_or_404(Purchase, purchaser=request.user)
-        recipe_id = request.data.get("id", None)
+        recipe_id = request.data.get("id")
         if not recipe_id:
             return Response({"success": False},
                             status=status.HTTP_404_NOT_FOUND)

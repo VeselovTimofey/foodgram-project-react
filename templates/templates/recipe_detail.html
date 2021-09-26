@@ -1,6 +1,5 @@
-{% extends "include/base.html" %}
+{% extends "templates/base.html" %}
 {% load static %}
-{% load separation_list %}
 
 
 {% block page_title %}
@@ -60,8 +59,8 @@
             <ul class="single-card__items">
                 {% if user != recipe.author %}
                     <li class="single-card__item">
-                        <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
-                        <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button>
+                        {% include "include/purchses_button.html" %}
+                        {% include "include/subscribe_button.html" %}
                     </li>
                 {% endif %}
             </ul>
@@ -71,7 +70,7 @@
                     <ul class="card__items">
                         {% for ingredient in ingredients %}
                             <li class=" single-card__section-item">
-                                {{ ingredient|get_element:'0' }} - {{ ingredient|get_element:'1' }} {{ ingredient|get_element:'2' }}
+                                {{ ingredient.0 }} - {{ ingredient.1 }} {{ ingredient.2 }}
                             </li>
                         {% endfor %}
                     </ul>

@@ -11,7 +11,7 @@ class IngredientFilter(FilterSet):
     @property
     def qs(self):
         queryset = super().qs
-        name = self.request.query_params.get("query", None)
+        name = self.request.query_params.get("query")
         if name:
             name = name[:-1]
         return queryset.filter(name=name)

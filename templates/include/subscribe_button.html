@@ -1,0 +1,7 @@
+<button name="subscribe" class="button button_style_light-blue button_size_subscribe
+    {% if recipe.author.id in subscribe %}
+        button_size_subscribe button_style_blue" name="subscribe">Отписаться от автора
+    {% else %}
+        " data-out>Подписаться на автора
+    {% endif %}
+</button>
