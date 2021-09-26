@@ -18,24 +18,28 @@
         <h1 class="main__title">{{ page_title }}</h1>
     </div>
     <div class="card-list card-list_column">
-        <ul class="shopping-list">
-            {% for recipe in page_obj %}
-                <li class="shopping-list__item" data-id="{{ recipe.id }}">
-                    <div class="recipe recipe_reverse">
-                        {% thumbnail recipe.image "100x50" crop="center" upscale=True as im %}
-                            <img src="{{ im.url }}" alt="{{ recipe.name }}" class="card__image">
-                        {% endthumbnail %}
-                        <h3 class="recipe__title">{{ recipe.name }}</h3>
-                        <p class="recipe__text"><span class="icon-time"></span> {{ recipe.time_cooking }} мин.</p>
-                    </div>
-                    <a href="#" class="shopping-list__button link">Удалить</a>
-                </li>
-            {% endfor %}
-            {% if page_obj.has_other_pages %}
-                {% include "include/paginator.html" with items=page_obj paginator=paginator %}
-            {% endif %}
-        </ul>
-        <a href="{% url 'add_to_purchase' %}"><button class="button button_style_blue">Скачать список</button></a>
+        {% if not page_obj %}
+            <h3 class="form__label">У вас нету покупок.</h3>
+        {% else %}
+            <ul class="shopping-list">
+                {% for recipe in page_obj %}
+                    <li class="shopping-list__item" data-id="{{ recipe.id }}">
+                        <div class="recipe recipe_reverse">
+                            {% thumbnail recipe.image "100x50" crop="center" upscale=True as im %}
+                                <img src="{{ im.url }}" alt="{{ recipe.name }}" class="card__image">
+                            {% endthumbnail %}
+                            <h3 class="recipe__title">{{ recipe.name }}</h3>
+                            <p class="recipe__text"><span class="icon-time"></span> {{ recipe.time_cooking }} мин.</p>
+                        </div>
+                        <a href="#" class="shopping-list__button link">Удалить</a>
+                    </li>
+                {% endfor %}
+                {% if page_obj.has_other_pages %}
+                    {% include "include/paginator.html" with items=page_obj paginator=paginator %}
+                {% endif %}
+            </ul>
+            <a href="{% url 'add_to_purchase' %}"><button class="button button_style_blue">Скачать список</button></a>
+        {% endif %}
     </div>
 {% endblock %}
 

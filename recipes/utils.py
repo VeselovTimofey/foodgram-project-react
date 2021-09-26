@@ -1,6 +1,8 @@
-from recipes.models import Ingredient, Purchase, Recipe
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.shortcuts import get_list_or_404
+
+from recipes.models import Ingredient, Purchase, Recipe, Tag
 
 
 def get_selected_ingredients(request):
@@ -17,12 +19,12 @@ def get_selected_ingredients(request):
 def get_selected_tags(request):
     """ This function return tags which the user has chosen
      from create_recipe or update_recipe page. """
-    name_tag = {"breakfast": "Завтрак", "lunch": "Обед", "dinner": "Ужин"}
-    tags = []
+    tags = Tag.objects.all().values_list("name", flat=True)
+    list_tags = []
     for key, value in request.POST.items():
-        if key in name_tag.keys():
-            tags.append(name_tag[key])
-    return tags
+        if key in tags:
+            list_tags.append(key)
+    return list_tags
 
 
 def get_recipe_ingredients(recipe):
@@ -41,11 +43,11 @@ def get_user_purchases(purchaser):
 
 def get_user_favorites(user):
     """ This function return list with user favorite. """
-    list_favorites = user.favorites.all()
-    list_favorites_name = []
-    for favorite in list_favorites:
-        list_favorites_name.append(favorite.recipe)
-    return list_favorites_name
+    favorites = user.favorites.all()
+    if favorites:
+        list_favorites_name = get_list_or_404(Recipe, favorites__in=favorites)
+        return list_favorites_name
+    return []
 
 
 def authenticated_user_context_update(request, context):
@@ -59,7 +61,8 @@ def authenticated_user_context_update(request, context):
     return context
 
 
-def paginator_request(request, entity, number_of_pages=settings.NUMBER_OF_PAGES):
+def paginator_request(request, entity,
+                      number_of_pages=settings.NUMBER_OF_PAGES):
     """ This function get current page, object and number of pages.
      And return page_obj. """
     paginator = Paginator(entity, number_of_pages)
@@ -93,8 +96,8 @@ def create_slug(name):
                 "ш": "sh", "щ": "sh", "ы": "i", "э": "e", "ю": "ai",
                 "я": "yi"}
     slug = ""
-    for n in name:
-        if n not in alphabet:
+    for letter in name:
+        if letter not in alphabet:
             continue
-        slug += alphabet[n]
+        slug += alphabet[letter]
     return slug

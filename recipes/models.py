@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from recipes.validators import value_must_not_be_null, value_is_russia
+from recipes.validators import value_is_russia, value_must_not_be_null
 
 User = get_user_model()
 
@@ -49,7 +49,8 @@ class Recipe(models.Model):
     tags = models.ManyToManyField(Tag, related_name="recipes",
                                   verbose_name="recipe tags")
     time_cooking = models.PositiveIntegerField(
-        validators=[value_must_not_be_null], verbose_name="recipe preparation time"
+        validators=[value_must_not_be_null],
+        verbose_name="recipe preparation time"
     )
     slug = models.SlugField(unique=True, max_length=75,
                             verbose_name="recipe slug")

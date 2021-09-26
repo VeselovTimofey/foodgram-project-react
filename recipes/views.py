@@ -3,11 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from recipes.models import Ingredient, Purchase, Recipe, RecipeIngredient, Tag
+from recipes.models import Purchase, Recipe
 from recipes.utils import (authenticated_user_context_update,
-                           get_recipe_ingredients, get_selected_ingredients,
-                           get_selected_tags, paginator_request, tag_filter,
-                           create_slug)
+                           get_recipe_ingredients, paginator_request,
+                           tag_filter)
 
 from .forms import RecipeForm
 
@@ -48,6 +47,11 @@ def recipe_detail(request, slug):
     context = {"recipe": recipe, "ingredients": list_ingredient,
                "page_title": page_title}
     context = authenticated_user_context_update(request, context)
+    if request.user.is_authenticated:
+        subscribe = request.user.who_subscribes.all().values_list(
+            "who_are_subscribed_to", flat=True
+        )
+        context.update(subscribe=subscribe)
     return render(request, "templates/recipe_detail.html", context)
 
 
@@ -93,8 +97,12 @@ def subscribe_page(request):
 def purchase_page(request):
     """ List of current user`s Purchase """
     page_title = "Список покупок"
-    recipes = Purchase.objects.get(purchaser=request.user).purchases.all()
-    page_obj = paginator_request(request, recipes, 3)
+    purchase = get_object_or_404(Purchase, purchaser=request.user)
+    recipes = purchase.purchases.all()
+    if recipes.exists():
+        page_obj = paginator_request(request, recipes, 3)
+    else:
+        page_obj = None
     context = {"page_obj": page_obj, "page_title": page_title}
     context = authenticated_user_context_update(request, context)
     return render(request, "templates/purchase.html", context)
@@ -117,20 +125,7 @@ def create_recipe(request):
     context.update(form=form)
 
     if form.is_valid():
-        recipe = form.save(commit=False)
-        recipe.author = request.user
-        recipe.slug = create_slug(recipe.name)
-        recipe.save()
-        tags = get_selected_tags(request)
-        for name in tags:
-            tag = get_object_or_404(Tag, name=name)
-            recipe.tags.add(tag)
-        ingredients = get_selected_ingredients(request)
-        for name in ingredients:
-            ingredient = get_object_or_404(Ingredient, name=name)
-            RecipeIngredient.objects.create(recipe=recipe,
-                                            ingredient=ingredient,
-                                            count=ingredients[name])
+        form.save(request)
         return redirect(reverse("index"))
 
     return render(request, "templates/recipe_create.html", context)
@@ -141,10 +136,7 @@ def update_recipe(request, slug):
     """ This page update recipe. """
     recipe = get_object_or_404(Recipe, slug=slug)
     page_title = f"Изменение рецепта {recipe.name}"
-    tags = recipe.tags.all()
-    list_tag = []
-    for tag in tags:
-        list_tag.append(tag.name)
+    list_tag = recipe.tags.all().values_list("name", flat=True)
     list_ingredient = get_recipe_ingredients(recipe=recipe)
 
     if request.user != recipe.author:
@@ -156,24 +148,11 @@ def update_recipe(request, slug):
                "list_ingredient": list_ingredient, "page_title": page_title}
     context = authenticated_user_context_update(request, context)
 
-    if request.method != "POST" or form.is_valid() is False:
-        return render(request, "templates/recipe_update.html", context)
+    if request.method != "POST" or not form.is_valid():
+        return render(request, "templates/recipe_create.html", context)
 
-    form.save()
-    new_tags = get_selected_tags(request)
-    for tag in Tag.objects.all():
-        if tag.name in new_tags and tag.name not in list_tag:
-            recipe.tags.add(tag)
-        elif tag.name not in new_tags and tag.name in list_tag:
-            recipe.tags.remove(tag)
-    ingredients = get_selected_ingredients(request)
-    RecipeIngredient.objects.filter(recipe=recipe).delete()
-    for name in ingredients:
-        ingredient = get_object_or_404(Ingredient, name=name)
-        RecipeIngredient.objects.create(recipe=recipe,
-                                        ingredient=ingredient,
-                                        count=ingredients[name])
-    return redirect(reverse("recipe", kwargs={"slug": slug}))
+    form.save(request)
+    return redirect(reverse("index"))
 
 
 @login_required
