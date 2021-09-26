@@ -44,10 +44,8 @@ def get_user_purchases(purchaser):
 def get_user_favorites(user):
     """ This function return list with user favorite. """
     favorites = user.favorites.all()
-    if favorites:
-        list_favorites_name = get_list_or_404(Recipe, favorites__in=favorites)
-        return list_favorites_name
-    return []
+    list_favorites_name = Recipe.objects.filter(favorites__in=favorites)
+    return list_favorites_name
 
 
 def authenticated_user_context_update(request, context):
