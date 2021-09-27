@@ -23,7 +23,7 @@ class RecipeForm(forms.ModelForm):
         }
 
     def save(self, request, commit=True):
-        recipe = super(RecipeForm, self).save(commit=False)
+        recipe = super().save(commit=False)
         recipe.author = request.user
         recipe.slug = create_slug(recipe.name)
         if commit:
