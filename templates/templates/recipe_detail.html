@@ -57,7 +57,7 @@
                 </ul>
             </div>
             <ul class="single-card__items">
-                {% if user != recipe.author %}
+                {% if user != recipe.author and user.is_authenticated %}
                     <li class="single-card__item">
                         {% include "include/purchses_button.html" %}
                         {% include "include/subscribe_button.html" %}
