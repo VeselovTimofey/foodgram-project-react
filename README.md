@@ -29,23 +29,24 @@ Website where you can publish recipes, subscribe to publications of other users,
 ``` python manage.py collectstatic ```
 - Create superuser
 ``` python manage.py createsuperuser ```
-- To fill the database ingredient and tag
-``` python manage.py load_ingredient ```
-``` python manage.py create_tag ```
+- To fill the database (full commands your options)
+``` pg_restore --host "HOST" --port "PORT" --username "USER" --dbname "NAME" --section=data --verbose "~/foodgram_db.dump" ```
+- If image don`t work try 
+``` python manage.py fix_images ```
 - Run local server
 ``` python manage.py run server ```
 ### Launch project with docker-compose
 - Application launch
 ``` docker-compose up -d ```
 - Make migrations
-``` docker-compose exec python manage.py migrate ```
+``` docker-compose exec web python manage.py migrate ```
 - Collect static files
-``` docker-compose exec python manage.py collectstatic ```
+``` docker-compose exec web python manage.py collectstatic ```
 - Creating superuser
-``` docker-compose exec python manage.py createsuperuser ```
-- To fill the base ingredient and tag
-``` docker-compose exec python manage.py load_ingredient ```
-``` docker-compose exec python manage.py create_tag ```
+``` docker-compose exec web python manage.py createsuperuser ```
+- To fill the base (full commands your options)
+``` docker-compose exec db pg_restore --host "HOST" --port "PORT" --username "USER" --dbname "NAME" --section=data --verbose "~/foodgram_db.dump" ```
+``` docker-compose exec web python manage.py fix_images ```
 ### Author
 Veselov Timofey
 vestimofey@mail.ru
