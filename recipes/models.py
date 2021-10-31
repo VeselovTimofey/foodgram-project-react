@@ -75,8 +75,10 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
                                    related_name="ingredient_in_recipes",
                                    verbose_name="this ingredient")
-    count = models.IntegerField(validators=[MinValueValidator(1)],
-                                verbose_name="ingredient amount")
+    count = models.PositiveIntegerField(
+        validators=[value_must_not_be_null],
+        verbose_name="ingredient amount"
+    )
 
     class Meta:
         verbose_name = "unique ingredient in the recipe"

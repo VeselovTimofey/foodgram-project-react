@@ -34,6 +34,13 @@
 @import "../blocks/shopping-list/__button/shopping-list__button.css";
 
 
+@import "../blocks/pagination/pagination.css";
+@import "../blocks/pagination/__container/pagination__container.css";
+@import "../blocks/pagination/__item/pagination__item.css";
+@import "../blocks/pagination/__item/_active/pagination__item_active.css";
+@import "../blocks/pagination/__link/pagination__link.css";
+
+
 @import "../blocks/footer/footer.css";
 @import "../blocks/footer/__container/footer__container.css";
 @import "../blocks/footer/__link/footer__link.css";

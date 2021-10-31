@@ -4,9 +4,11 @@ from recipes import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("tag/<str:tag>/", views.tags_page, name="tag"),
-    path("profile/<str:author>/tag/<str:tag>/", views.tags_page,
+    path("tag/<str:tags>/", views.tags_page, name="tag"),
+    path("profile/<str:author>/tag/<str:tags>/", views.tags_page,
          name="author_tag"),
+    path("favorite/<str:favorite_user>/tag/<str:tags>/", views.tags_page,
+         name="favorite_user_tag"),
     path("favorite/", views.favorite_page, name="favorite"),
     path("subscribe/", views.subscribe_page, name="subscribe"),
     path("purchase/", views.purchase_page, name="purchase"),

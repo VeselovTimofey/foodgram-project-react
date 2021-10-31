@@ -10,6 +10,17 @@
         <h1 class="main__title">{{ page_title }}</h1>
         {% include "include/tag.html" %}
     </div>
+    {% if user.is_authenticated and user != author %}
+        <div class="author-subscribe" data-author={{ author.id }}>
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe"
+                                                   {% if author in subscribe %}
+            >Отписаться от автора</button>
+                {% else %}
+                data-out>Подписаться на автора</button>
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
     <div class="card-list">
         {% for recipe in page_obj %}
             {% include "include/recipe_card.html" %}
@@ -17,7 +28,7 @@
     </div>
 
     {% if page_obj.has_other_pages %}
-        {% include "include/paginator.html" with items=page_obj paginator=paginator %}
+        {% include "include/paginator.html" with items=page_obj %}
     {% endif %}
 {% endblock %}
 
