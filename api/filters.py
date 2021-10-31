@@ -14,4 +14,4 @@ class IngredientFilter(FilterSet):
         name = self.request.query_params.get("query")
         if name:
             name = name[:-1]
-        return queryset.filter(name=name)
+        return queryset.filter(name__startswith=name)

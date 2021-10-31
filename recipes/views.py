@@ -5,8 +5,9 @@ from django.urls import reverse
 
 from recipes.models import Purchase, Recipe
 from recipes.utils import (authenticated_user_context_update,
-                           get_recipe_ingredients, paginator_request,
-                           tag_filter)
+                           checking_ingredients_for_errors,
+                           create_subscribe_list, get_recipe_ingredients,
+                           paginator_request, tag_filter, tags_context_update)
 
 from .forms import RecipeForm
 
@@ -19,22 +20,37 @@ def index(request):
     """ Main page that displays list of Recipes. """
     recipes = Recipe.objects.all()
     page_title = "Рецепты"
-    page_obj = paginator_request(request, recipes)
-    context = {"page_obj": page_obj, "page_title": page_title}
+    context = paginator_request(request, recipes)
+    context.update(page_title=page_title)
+    context = tags_context_update(context)
     context = authenticated_user_context_update(request, context)
     return render(request, "templates/index.html", context)
 
 
-def tags_page(request, tag, author=None):
-    """ This page display list of recipe, which has a current tag. """
-    page_title = tag
-    if tag not in TAGS:
+def tags_page(request, tags, author=None, favorite_user=None):
+    """ This page display list of recipe, which has a current tags. """
+    if tags == "Нет тегов" and author:
+        return redirect(reverse("profile", kwargs={"username": author}))
+    elif tags == "Нет тегов" and favorite_user:
+        return redirect(reverse("favorite"))
+    elif tags == "Нет тегов":
         return redirect(reverse("index"))
-    recipes, html = tag_filter(tag, author)
-    page_obj = paginator_request(request, recipes)
-    context = {
-        "page_obj": page_obj, "author": author, "page_title": page_title
-    }
+    if author:
+        page_title = author
+    elif favorite_user:
+        page_title = "Избранное"
+    else:
+        page_title = "Рецепты"
+    old_tags = tags.split()
+    recipes, html = tag_filter(old_tags, author, favorite_user)
+    context = paginator_request(request, recipes)
+    if author:
+        author = get_object_or_404(User, username=author)
+        subscribe = create_subscribe_list(request)
+        context.update(subscribe=subscribe)
+    context.update(page_title=page_title, author=author,
+                   favorite_user=favorite_user, old_tags=old_tags)
+    context = tags_context_update(context)
     context = authenticated_user_context_update(request, context)
     return render(request, html, context)
 
@@ -62,8 +78,9 @@ def favorite_page(request):
     recipes = Recipe.objects.filter(
         favorites__user__username=request.user
     )
-    page_obj = paginator_request(request, recipes)
-    context = {"page_obj": page_obj, "page_title": page_title}
+    context = paginator_request(request, recipes)
+    context.update(page_title=page_title, favorite_user=request.user)
+    context = tags_context_update(context)
     context = authenticated_user_context_update(request, context)
     return render(request, "templates/index.html", context)
 
@@ -72,11 +89,15 @@ def user_page(request, username):
     """ User page that display list of user recipes. """
     page_title = username
     recipes = Recipe.objects.filter(author__username=username)
-    page_obj = paginator_request(request, recipes)
-    context = {
-        "page_obj": page_obj, "author": username, "page_title": page_title
-    }
+    author = get_object_or_404(User, username=username)
+    context = paginator_request(request, recipes)
+    context.update(author=author, page_title=page_title)
+    context = tags_context_update(context)
     context = authenticated_user_context_update(request, context)
+    if request.user.is_authenticated:
+        subscribe = create_subscribe_list(request)
+        context.update(subscribe=subscribe)
+        print(subscribe)
     return render(request, "templates/profile.html", context)
 
 
@@ -84,11 +105,9 @@ def user_page(request, username):
 def subscribe_page(request):
     """ List of current user`s Subscribe. """
     page_title = "Мои подписки"
-    subscribe_list = User.objects.filter(
-            subscriptions__who_subscribes__username=request.user
-    )
-    page_obj = paginator_request(request, subscribe_list, 3)
-    context = {"page_obj": page_obj, "page_title": page_title}
+    subscribe_list = create_subscribe_list(request)
+    context = paginator_request(request, subscribe_list, 3)
+    context.update(page_title=page_title)
     context = authenticated_user_context_update(request, context)
     return render(request, "templates/my_subscribe.html", context)
 
@@ -100,10 +119,10 @@ def purchase_page(request):
     purchase = get_object_or_404(Purchase, purchaser=request.user)
     recipes = purchase.purchases.all()
     if recipes.exists():
-        page_obj = paginator_request(request, recipes, 3)
+        context = paginator_request(request, recipes, 3)
     else:
-        page_obj = None
-    context = {"page_obj": page_obj, "page_title": page_title}
+        context = {}
+    context.update(page_title=page_title)
     context = authenticated_user_context_update(request, context)
     return render(request, "templates/purchase.html", context)
 
@@ -123,6 +142,7 @@ def create_recipe(request):
 
     form = RecipeForm(request.POST or None, files=request.FILES or None)
     context.update(form=form)
+    checking_ingredients_for_errors(request, form)
 
     if form.is_valid():
         form.save(request)
@@ -143,6 +163,7 @@ def update_recipe(request, slug):
         return redirect(reverse("create_recipe"))
 
     form = RecipeForm(request.POST or None, instance=recipe)
+    checking_ingredients_for_errors(request, form)
 
     context = {"form": form, "recipe": recipe, "list_tag": list_tag,
                "list_ingredient": list_ingredient, "page_title": page_title}

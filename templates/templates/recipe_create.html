@@ -49,11 +49,7 @@
                 <div class="form__field-group">
                     <div class="form__field-group-ingredientes">
                         <div class="form__dropdown">
-                            <select class="form__input" id="nameIngredient">
-                                {% for ingredient in form.all_ingredients %}
-                                    <option>{{ ingredient.name }}</option>
-                                {% endfor %}
-                            </select>
+                            <input type="text" id="nameIngredient" class="form__input">
                             <div class="form__dropdown-items"></div>
                         </div>
                         <input type="number" id="cantidad" class="form__input" min="1">

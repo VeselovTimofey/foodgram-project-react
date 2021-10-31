@@ -11,7 +11,7 @@ Website where you can publish recipes, subscribe to publications of other users,
 - Gunicorn 20.1.0
 - Nginx 1.21.0
 - Docker 20.10.5
-### Before launching the project, enter the values of your database into .env file
+### Before launching the project, enter the values of your database and SMTP-server into .env file
 - "ENGINE" = the path to your database, like "django.db.backends.your_database"
 - "NAME" = name your database
 - "USER" = username django will use to access the database
@@ -19,6 +19,11 @@ Website where you can publish recipes, subscribe to publications of other users,
 - "HOST" = ip adress your database
 - "PORT" = access port your database
 - "SECRET_KEY" = django secret key
+- "EMAIL_HOST" = Host to be used to send email
+- "EMAIL_PORT" = Port used for SMTP server
+- "EMAIL_HOST_USER" = The name of the email that the smtp server will use
+- "EMAIL_HOST_PASSWORD" = email password
+- "EMAIL_USE_TLS" = Whether to use TLS (secure) connection when communicating with the SMTP server.
 ### Launch project with django server
 - Install and activate virtual environment
 - Install dependency from requrements.txt
@@ -31,8 +36,6 @@ Website where you can publish recipes, subscribe to publications of other users,
 ``` python manage.py createsuperuser ```
 - To fill the database (full commands your options)
 ``` pg_restore --host "HOST" --port "PORT" --username "USER" --dbname "NAME" --section=data --verbose "~/foodgram_db.dump" ```
-- If image don`t work try 
-``` python manage.py fix_images ```
 - Run local server
 ``` python manage.py run server ```
 ### Launch project with docker-compose
@@ -46,7 +49,6 @@ Website where you can publish recipes, subscribe to publications of other users,
 ``` docker-compose exec web python manage.py createsuperuser ```
 - To fill the base (full commands your options)
 ``` docker-compose exec db pg_restore --host "HOST" --port "PORT" --username "USER" --dbname "NAME" --section=data --verbose "~/foodgram_db.dump" ```
-``` docker-compose exec web python manage.py fix_images ```
 ### Author
 Veselov Timofey
 vestimofey@mail.ru

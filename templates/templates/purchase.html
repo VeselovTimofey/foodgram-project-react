@@ -35,7 +35,7 @@
                     </li>
                 {% endfor %}
                 {% if page_obj.has_other_pages %}
-                    {% include "include/paginator.html" with items=page_obj paginator=paginator %}
+                    {% include "include/paginator.html" with items=page_obj %}
                 {% endif %}
             </ul>
             <a href="{% url 'add_to_purchase' %}"><button class="button button_style_blue">Скачать список</button></a>
