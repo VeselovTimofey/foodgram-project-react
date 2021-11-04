@@ -92,7 +92,7 @@ def paginator_request(request, entity,
     paginator = Paginator(entity, number_of_pages)
     page_number = request.GET.get("page")
     page_range = paginator.get_elided_page_range(
-        number=page_number if page_number else 1, on_each_side=1, on_ends=0
+        number=page_number if page_number else 1, on_each_side=1, on_ends=1
     )
     page_obj = paginator.get_page(page_number)
     context = {"page_obj": page_obj, "page_range": list(page_range)}
