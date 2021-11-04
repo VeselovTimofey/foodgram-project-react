@@ -97,7 +97,6 @@ def user_page(request, username):
     if request.user.is_authenticated:
         subscribe = create_subscribe_list(request)
         context.update(subscribe=subscribe)
-        print(subscribe)
     return render(request, "templates/profile.html", context)
 
 
@@ -162,7 +161,9 @@ def update_recipe(request, slug):
     if request.user != recipe.author:
         return redirect(reverse("create_recipe"))
 
-    form = RecipeForm(request.POST or None, instance=recipe)
+    form = RecipeForm(
+        request.POST or None, files=request.FILES or None, instance=recipe
+    )
     checking_ingredients_for_errors(request, form)
 
     context = {"form": form, "recipe": recipe, "list_tag": list_tag,
