@@ -3,11 +3,9 @@ from django import forms
 
 def value_is_russia(value):
     """ value must be written in Cyrillic. """
-    alphabet = ["а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и",
-                "й", "к", "л", "м", "н", "о", "п", "р", "с", "т",
-                "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь",
-                "э", "ю", "я", " ", ".", ",", ";", ":", "-", "_",
-                "!", "?"]
+    alphabet = ["ё", " ", ".", ",", ";", ":", "-", "_", "!", "?"]
+    a = ord('а')
+    [alphabet.append(chr(letter)) for letter in range(a, a + 32)]
     value = value.lower()
     for letter in value:
         if letter not in alphabet:
