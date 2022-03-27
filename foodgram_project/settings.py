@@ -11,9 +11,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = ['localhost',
-                 'web',
                  '127.0.0.1',
-                 '178.154.213.197',
                  '[::1]',
                  'testserver']
 
@@ -64,9 +62,9 @@ WSGI_APPLICATION = 'foodgram_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('ENGINE'),
-        'NAME': os.getenv('NAME'),
-        'USER': os.getenv('USER'),
-        'PASSWORD': os.getenv('PASSWORD'),
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('HOST'),
         'PORT': os.getenv('PORT'),
     }

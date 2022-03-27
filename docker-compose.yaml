@@ -1,16 +1,10 @@
 version: '3.8'
-
-volumes:
-  postgres_data:
-  static_value:
-  media_value:
-
-
 services:
-  db:
+  postgres:
+    container_name: postgres
     image: postgres:12.4
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - /var/lib/pgsql/data/
     ports:
       - "5432:5432"
     restart: always
@@ -18,17 +12,25 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     env_file:
       - ./.env
-  web:
-    build: .
+
+  foodgram:
+    container_name: foodgram
+    image: vestimofey/foodgram:v1.0
     restart: always
     volumes:
       - static_value:/code/static/
       - media_value:/code/media/
+    ports:
+      - "8000:8000"
     depends_on:
-      - db
+      - postgres
+    environment:
+      HOST: "postgres"
     env_file:
       - ./.env
+
   nginx:
+    container_name: nginx
     image: nginx:1.19.3
     ports:
       - "80:80"
@@ -37,4 +39,9 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - web
+      - foodgram
+
+volumes:
+  postgres_data:
+  static_value:
+  media_value:
