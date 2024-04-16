@@ -22,6 +22,8 @@ Website where you can publish recipes, subscribe to publications of other users,
 ``` docker cp foodgram_db.dump postgres:/home/ ```
 - To full the base(use twice to bring tags to recipes)
 ``` docker-compose exec postgres pg_restore --host "127.0.0.1" --port "5432" --username "Timofey" --password --role "Timofey" --dbname "foodgram_db" --section=pre-data --section=data --section=post-data --verbose "/home/foodgram_db.dump" ```
+### Status
+Complete.
 ### Author
 Veselov Timofey <br />
 vestimofey@mail.ru
