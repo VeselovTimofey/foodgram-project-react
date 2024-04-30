@@ -4,6 +4,15 @@ Website where you can publish recipes, subscribe to publications of other users,
 [Link to docker!](https://hub.docker.com/repository/docker/vestimofey/foodgram)
 - Admin: Timofey
 - Password: haLo3V1q
+### Screenshot
+- main page
+![main page](https://raw.githubusercontent.com/VeselovTimofey/foodgram-project-react/assets/main_page.bmp)
+- registration page
+![registration page](https://raw.githubusercontent.com/VeselovTimofey/foodgram-project-react/assets/registration_page.bmp)
+- subscribe page
+![purchase page](https://raw.githubusercontent.com/VeselovTimofey/foodgram-project-react/assets/purchase_page.bmp)
+- purchase list page
+![purchase list page](https://raw.githubusercontent.com/VeselovTimofey/foodgram-project-react/assets/purchase_list_page.bmp)
 ### Technologies
 - Python 3.9
 - Django 3.2.3
