@@ -13,6 +13,7 @@ Website where you can publish recipes, subscribe to publications of other users,
 <img src="https://raw.githubusercontent.com/VeselovTimofey/foodgram-project-react/assets/purchase_page.bmp" width="480" height="270" alt="subscribe page">
 - purchase list page <br>
 <img src="https://raw.githubusercontent.com/VeselovTimofey/foodgram-project-react/assets/purchase_list_page.bmp" width="480" height="270" alt="purchase list page">
+
 ### Technologies
 - Python 3.9
 - Django 3.2.3
